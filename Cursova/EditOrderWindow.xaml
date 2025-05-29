@@ -111,8 +111,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto" MinHeight="0"/>
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#FFD5E8FF" Padding="10">
@@ -143,12 +143,12 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10,10,10,10">
             <StackPanel x:Name="OrderItemsStackPanel">
             </StackPanel>
         </ScrollViewer>
 
-        <Border Grid.Row="1" Background="#FFD5E8FF" Padding="10" Margin="0,477,0,0" Grid.RowSpan="2">
+        <Border Grid.Row="1" Background="#FFD5E8FF" Padding="10" Margin="0,465,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -168,11 +168,11 @@
                         Content="Зберегти зміни"
                         Style="{StaticResource ActionButtonStyle}"
                         Click="SaveChangesButton_Click"
-                        Margin="544,-2,115,-3" Foreground="Black"/>
+                        Margin="490,0,139,0" Foreground="Black"/>
                 <Button
                         Content="Скасувати"
                         Style="{StaticResource ActionButtonStyle}"
-                        Click="CancelButton_Click" Foreground="Black" Margin="677,-2,0,-3"/>
+                        Click="CancelButton_Click" Foreground="Black" Margin="664,0,0,0"/>
             </Grid>
         </Border>
     </Grid>

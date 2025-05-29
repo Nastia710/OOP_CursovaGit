@@ -141,12 +141,12 @@
                            Foreground="Black" Width="803" TextAlignment="Center"/>
 
                 <Button Grid.Column="1"
-                        Content="..."
+                        Content="+"
                         FontSize="24"
                         FontWeight="Bold"
                         Width="40" Height="40"
-                        Background="Transparent"
-                        Foreground="Gray"
+                        Background="#FF89C0F9"
+                        Foreground="Black"
                         BorderThickness="0"
                         Cursor="Hand"
                         Click="MenuManagementButton_Click"
@@ -193,7 +193,7 @@
                         Content="Підтвердити вибір"
                         Style="{StaticResource BottomActionButtonStyle}"
                         Click="ConfirmSelectionButton_Click"
-                        Margin="619,-3,113,-3" Foreground="Black"/>
+                        Margin="594,-3,113,-3" Foreground="Black"/>
                 <Button
                         Content="Скасувати"
                         Style="{StaticResource BottomActionButtonStyle}"

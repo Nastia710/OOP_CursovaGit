@@ -71,6 +71,7 @@ namespace Cursova
             Grid itemGrid = new Grid();
             itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             StackPanel itemDetailsPanel = new StackPanel();
 
@@ -121,7 +122,10 @@ namespace Cursova
                 {
                     Content = "Додати",
                     Style = (Style)FindResource("AddButtonMenu"),
-                    Tag = item
+                    Tag = item,
+                    Foreground = Brushes.Black,
+                    Width = 70,
+                    Height = 30,
                 };
                 addButton.Click += AddToOrderButton_Click;
                 controlPanel.Children.Add(addButton);
@@ -170,6 +174,22 @@ namespace Cursova
 
             Grid.SetColumn(controlPanel, 1);
             itemGrid.Children.Add(controlPanel);
+
+            // Add three dots button
+            Button threeDotsButton = new Button
+            {
+                Content = "⋮",
+                Style = (Style)FindResource("QuantityButtonStyle"),
+                Tag = item,
+                FontSize = 20,
+                Width = 30,
+                Height = 30,
+                Margin = new Thickness(10, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            threeDotsButton.Click += ThreeDotsButton_Click;
+            Grid.SetColumn(threeDotsButton, 2);
+            itemGrid.Children.Add(threeDotsButton);
 
             itemBorder.Child = itemGrid;
             return itemBorder;
@@ -335,14 +355,6 @@ namespace Cursova
             addMenuItem.Click += (s, ev) => OpenDishEditAddWindow(null);
             contextMenu.Items.Add(addMenuItem);
 
-            MenuItem editMenuItem = new MenuItem { Header = "Редагувати страву" };
-            editMenuItem.Click += (s, ev) => ShowSelectDishToEditDialog();
-            contextMenu.Items.Add(editMenuItem);
-
-            MenuItem deleteMenuItem = new MenuItem { Header = "Видалити страву" };
-            deleteMenuItem.Click += (s, ev) => ShowSelectDishToDeleteDialog();
-            contextMenu.Items.Add(deleteMenuItem);
-
             contextMenu.IsOpen = true;
         }
 
@@ -357,48 +369,47 @@ namespace Cursova
             }
         }
 
-        private void ShowSelectDishToEditDialog()
+        private void ThreeDotsButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_menuManager.AllMenuItems.Any())
+            Button button = sender as Button;
+            MenuItemForOrder item = button.Tag as MenuItemForOrder;
+
+            if (item != null)
             {
-                OpenDishEditAddWindow(_menuManager.AllMenuItems.First());
-            }
-            else
-            {
-                MessageBox.Show("Меню порожнє. Немає страв для редагування.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Information);
+                ContextMenu contextMenu = new ContextMenu();
+                contextMenu.PlacementTarget = button;
+                contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+
+                MenuItem editMenuItem = new MenuItem { Header = "Редагувати страву" };
+                editMenuItem.Click += (s, ev) => OpenDishEditAddWindow(item);
+                contextMenu.Items.Add(editMenuItem);
+
+                MenuItem deleteMenuItem = new MenuItem { Header = "Видалити страву" };
+                deleteMenuItem.Click += (s, ev) => DeleteMenuItem(item);
+                contextMenu.Items.Add(deleteMenuItem);
+
+                contextMenu.IsOpen = true;
             }
         }
 
-        private void ShowSelectDishToDeleteDialog()
+        private void DeleteMenuItem(MenuItemForOrder item)
         {
-            if (_menuManager.AllMenuItems.Any())
+            MessageBoxResult confirmDelete = MessageBox.Show($"Видалити \"{item.Name}\" з меню?", 
+                                                           "Підтвердження", 
+                                                           MessageBoxButton.YesNo, 
+                                                           MessageBoxImage.Question);
+            if (confirmDelete == MessageBoxResult.Yes)
             {
-                MenuItemForOrder itemToDelete = _menuManager.AllMenuItems.FirstOrDefault(item => item.Name == "Борщ Український");
-                if (itemToDelete != null)
+                _menuManager.RemoveMenuItem(item);
+                LoadMenuToUI();
+                MessageBox.Show($"Страва \"{item.Name}\" видалена з меню.");
+                OrderItem orderItemToRemove = _currentOrderReference.Items.FirstOrDefault(oi => oi.Item.Name == item.Name);
+                if (orderItemToRemove != null)
                 {
-                    MessageBoxResult confirmDelete = MessageBox.Show($"Видалити \"{itemToDelete.Name}\" з меню?", "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (confirmDelete == MessageBoxResult.Yes)
-                    {
-                        _menuManager.RemoveMenuItem(itemToDelete);
-                        LoadMenuToUI();
-                        MessageBox.Show($"Страва \"{itemToDelete.Name}\" видалена з меню.");
-                        OrderItem orderItemToRemove = _currentOrderReference.Items.FirstOrDefault(oi => oi.Item.Name == itemToDelete.Name);
-                        if (orderItemToRemove != null)
-                        {
-                            _currentOrderReference.Items.Remove(orderItemToRemove);
-                            UpdateOrderSummary();
-                            _parentEditOrderWindow?.DisplayOrderItems();
-                        }
-                    }
+                    _currentOrderReference.Items.Remove(orderItemToRemove);
+                    UpdateOrderSummary();
+                    _parentEditOrderWindow?.DisplayOrderItems();
                 }
-                else
-                {
-                    MessageBox.Show("Не знайдено страви для видалення (тимчасовий приклад).", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Меню порожнє. Немає страв для видалення.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }
